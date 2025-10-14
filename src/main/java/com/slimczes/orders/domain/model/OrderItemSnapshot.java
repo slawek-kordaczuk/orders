@@ -7,11 +7,4 @@ public record OrderItemSnapshot(
     String name,
     int quantity
 ) {
-    public OrderItemSnapshot {
-        Objects.requireNonNull(sku, "Product SKU cannot be null");
-        Objects.requireNonNull(name, "Name cannot be null");
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be positive");
-        }
-    }
 }

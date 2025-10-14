@@ -3,7 +3,6 @@ package com.slimczes.orders.adapter.persistance.customer;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.UUID;
 
-import com.slimczes.orders.adapter.persistance.customer.entity.CustomerEntity;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 
 @ApplicationScoped

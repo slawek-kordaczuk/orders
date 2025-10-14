@@ -1,4 +1,4 @@
-package com.slimczes.orders.service.order.mapper;
+package com.slimczes.orders.service.order;
 
 import com.slimczes.orders.domain.event.OrderCancelled;
 import com.slimczes.orders.domain.event.OrderCreated;
@@ -11,13 +11,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
+import java.util.UUID;
+
 @Mapper(componentModel = MappingConstants.ComponentModel.JAKARTA_CDI)
-public interface OrderMapper {
+interface OrderMapper {
 
     @Mapping(target = "eventId", expression = "java(java.util.UUID.randomUUID())")
-    @Mapping(target = "orderId", source = "id")
-    @Mapping(target = "occurredAt", source = "createdAt")
-    OrderCreated toOrderCreated(Order order);
+    @Mapping(target = "orderId", source = "createdOrderId")
+    @Mapping(target = "occurredAt", source = "order.createdAt")
+    OrderCreated toOrderCreated(Order order, UUID createdOrderId);
 
     @Mapping(target = "name", source = "itemName")
     OrderItemSnapshot toOrderItemSnapshot(OrderItem orderItem);

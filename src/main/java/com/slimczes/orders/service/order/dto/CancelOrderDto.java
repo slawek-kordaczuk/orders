@@ -6,8 +6,7 @@ import java.util.UUID;
 public record CancelOrderDto(
     UUID orderId,
     UUID customerId,
-    String reason,
-    List<CreateOrderItem> items
+    String reason
 ) {
 
 }

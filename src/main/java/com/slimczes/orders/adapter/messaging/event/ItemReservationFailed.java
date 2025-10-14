@@ -7,7 +7,7 @@ import java.util.UUID;
 public record ItemReservationFailed(
     UUID eventId,
     UUID orderId,
-    List<ItemFailed> itemFailed,
+    List<ItemFailed> failedItems,
     Instant occurredAt
 ) {
 

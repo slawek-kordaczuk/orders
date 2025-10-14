@@ -4,6 +4,6 @@ import com.slimczes.orders.domain.event.OrderCancelled;
 import com.slimczes.orders.domain.event.OrderCreated;
 
 public interface ItemReservationPublisher {
-    void requestItemReservation(OrderCreated orderCreated);
-    void requestItemReservationCancel(OrderCancelled orderCancelled);
+    void publishItemReservation(OrderCreated orderCreated);
+    void publishItemReservationCancel(OrderCancelled orderCancelled);
 }

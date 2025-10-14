@@ -1,4 +1,4 @@
-package com.slimczes.orders.service.customer.dto;
+package com.slimczes.orders.service.customer;
 
 public record CreateCustomerDto (
     String email,

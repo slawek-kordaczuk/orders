@@ -11,7 +11,7 @@ import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 @ApplicationScoped
 @Slf4j
-public class ItemReservationKafkaPublisher implements ItemReservationPublisher {
+class ItemReservationKafkaPublisher implements ItemReservationPublisher {
 
     @Channel("reservations")
     Emitter<OrderCreated> reservationEmitter;
@@ -20,8 +20,8 @@ public class ItemReservationKafkaPublisher implements ItemReservationPublisher {
     Emitter<OrderCancelled> cancellationEmitter;
 
     @Override
-    public void requestItemReservation(OrderCreated orderCreated) {
-        log.info("Publishing item reservation request for order: {}", orderCreated.orderId());
+    public void publishItemReservation(OrderCreated orderCreated) {
+        log.info("Publishing item reservation request for order: {}", orderCreated);
         reservationEmitter.send(orderCreated).whenComplete((v, ex) -> {
             if (ex != null) {
                 log.error("Error sending item reservation request for order: {}", orderCreated.orderId(), ex);
@@ -32,8 +32,8 @@ public class ItemReservationKafkaPublisher implements ItemReservationPublisher {
     }
 
     @Override
-    public void requestItemReservationCancel(OrderCancelled orderCancelled) {
-        log.info("Publishing item reservation cancellation for order: {}", orderCancelled.orderId());
+    public void publishItemReservationCancel(OrderCancelled orderCancelled) {
+        log.info("Publishing item reservation cancellation for order: {}", orderCancelled);
         cancellationEmitter.send(orderCancelled).whenComplete((v, ex) -> {
             if (ex != null) {
                 log.error("Error sending item reservation cancellation for order: {}", orderCancelled.orderId(), ex);

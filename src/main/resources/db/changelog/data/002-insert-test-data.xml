@@ -41,8 +41,17 @@
             <column name="id" value="44444444-4444-4444-4444-444444444444"/>
             <column name="order_id" value="33333333-3333-3333-3333-333333333333"/>
             <column name="sku" value="TEST-SKU-001"/>
-            <column name="item_name" value="Test Product"/>
+            <column name="item_name" value="Test Product 1"/>
             <column name="quantity" value="1"/>
+            <column name="status" value="PENDING"/>
+        </insert>
+
+        <insert tableName="order_items">
+            <column name="id" value="55555555-5555-5555-5555-555555555555"/>
+            <column name="order_id" value="33333333-3333-3333-3333-333333333333"/>
+            <column name="sku" value="TEST-SKU-002"/>
+            <column name="item_name" value="Test Product 2"/>
+            <column name="quantity" value="2"/>
             <column name="status" value="PENDING"/>
         </insert>
     </changeSet>

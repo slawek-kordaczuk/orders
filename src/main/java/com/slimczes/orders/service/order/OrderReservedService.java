@@ -20,10 +20,11 @@ public class OrderReservedService {
 
     private final OrderRepository orderRepository;
 
+    @Transactional
     public void reserveOrder(OrderReservedDto orderReservedDto) {
         orderRepository.findById(orderReservedDto.orderId()).ifPresentOrElse(o -> {
             orderReservedDto.reservedItems()
-                            .forEach(item -> reservationItem(o, item));
+                    .forEach(item -> reservationItem(o, item));
             o.resolveOrderStatus(o.getVersion());
             orderRepository.upsert(o);
         }, () -> {
@@ -31,25 +32,26 @@ public class OrderReservedService {
         });
     }
 
-    private static void reservationItem(Order o, OrderReservedItem reservedItem) {
-        o.getItems().stream()
-         .filter(item -> item.getSku().equals(reservedItem.sku()))
-         .findAny()
-         .ifPresent(i -> i.updateStatus(ItemStatus.RESERVED));
-    }
-
+    @Transactional
     public void failedItemsOrder(OrderReservedFailedDto orderReservedFailedDto) {
         orderRepository.findById(orderReservedFailedDto.orderId()).ifPresentOrElse(o -> {
             orderReservedFailedDto.failedItems()
-                                  .forEach(reservedItem -> o.getItems().stream()
-                                                            .filter(item -> item.getSku().equals(reservedItem.sku()))
-                                                            .findAny()
-                                                            .ifPresent(i -> resolveFailedStatus(i, reservedItem)));
+                    .forEach(reservedItem -> o.getItems().stream()
+                            .filter(item -> item.getSku().equals(reservedItem.sku()))
+                            .findAny()
+                            .ifPresent(i -> resolveFailedStatus(i, reservedItem)));
             o.resolveOrderStatus(o.getVersion());
             orderRepository.upsert(o);
         }, () -> {
             throw new IllegalArgumentException("Order not found: " + orderReservedFailedDto.orderId());
         });
+    }
+
+    private static void reservationItem(Order o, OrderReservedItem reservedItem) {
+        o.getItems().stream()
+                .filter(item -> item.getSku().equals(reservedItem.sku()))
+                .findAny()
+                .ifPresent(i -> i.updateStatus(ItemStatus.RESERVED));
     }
 
     private static void resolveFailedStatus(OrderItem i, OrderReservedFailedItem cancelItem) {

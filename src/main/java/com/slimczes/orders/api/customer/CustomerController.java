@@ -12,7 +12,7 @@ import jakarta.ws.rs.core.Response;
 import java.util.UUID;
 
 import com.slimczes.orders.service.customer.CustomerService;
-import com.slimczes.orders.service.customer.dto.CreateCustomerDto;
+import com.slimczes.orders.service.customer.CreateCustomerDto;
 import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
@@ -30,6 +30,4 @@ public class CustomerController {
         UUID customerId = customerService.createCustomer(createCustomerDto);
         return Response.ok(new CreateCustomerResponse(customerId)).build();
     }
-
-
 }

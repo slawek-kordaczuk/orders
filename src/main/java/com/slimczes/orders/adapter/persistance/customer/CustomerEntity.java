@@ -1,4 +1,4 @@
-package com.slimczes.orders.adapter.persistance.customer.entity;
+package com.slimczes.orders.adapter.persistance.customer;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,9 +34,9 @@ public class CustomerEntity {
     @Column(nullable = false)
     private boolean deleted = false;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    @Column(nullable = false)
+    @Column(name = "updated_at",nullable = false)
     private Instant updatedAt;
 }

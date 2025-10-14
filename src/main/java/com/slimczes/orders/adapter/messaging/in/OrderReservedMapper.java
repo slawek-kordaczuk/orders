@@ -1,4 +1,4 @@
-package com.slimczes.orders.adapter.messaging.mapper;
+package com.slimczes.orders.adapter.messaging.in;
 
 import com.slimczes.orders.adapter.messaging.event.ItemFailed;
 import com.slimczes.orders.adapter.messaging.event.ItemReservationFailed;
@@ -14,14 +14,12 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.ValueMapping;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.JAKARTA_CDI)
-public interface OrderReservedMapper {
+interface OrderReservedMapper {
 
     OrderReservedDto toOrderReservedFromEvent(ItemsReserved itemsReserved);
 
     OrderReservedItem toOrderReservedItem(ReservedItem reservedItem);
 
-    @Mapping(source = "itemFailed", target = "failedItems")
-    @ValueMapping(source = MappingConstants.ANY_REMAINING, target = "FAILED")
     OrderReservedFailedDto toOrderReservedCancelFromEvent(ItemReservationFailed itemReservationFailed);
 
     OrderReservedFailedItem toOrderReservedCancelItem(ItemFailed itemFailed);

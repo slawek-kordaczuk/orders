@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public record CreateOrderDto(
     UUID customerId,
-    List<CreateOrderItem> items
+    List<OrderItem> items
 ) {
 
 }

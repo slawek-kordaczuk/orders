@@ -12,7 +12,6 @@ public class Customer {
     private final Instant createdAt;
     private Instant updatedAt;
 
-    // Constructor for new customers
     public Customer(String email, String name) {
         this.id = UUID.randomUUID();
         this.email = validateEmail(email);
@@ -22,15 +21,15 @@ public class Customer {
         this.updatedAt = Instant.now();
     }
 
-    // Constructor for existing customers (from persistence)
-//    public Customer(UUID id, String email, String name, boolean deleted, Instant createdAt, Instant updatedAt) {
-//        this.id = id;
-//        this.email = email;
-//        this.name = name;
-//        this.deleted = deleted;
-//        this.createdAt = createdAt;
-//        this.updatedAt = updatedAt;
-//    }
+    @Default
+    public Customer(UUID id, String email, String name, boolean deleted, Instant createdAt, Instant updatedAt) {
+        this.id = id;
+        this.email = email;
+        this.name = name;
+        this.deleted = deleted;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 
     // Business methods
     public void updateProfile(String name) {

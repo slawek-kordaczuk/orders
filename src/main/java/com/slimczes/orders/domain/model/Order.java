@@ -20,7 +20,7 @@ public class Order {
     private Instant updatedAt;
 
     public Order(UUID customerId) {
-        this.id = UUID.randomUUID();
+        this.id = null;
         this.customerId = validateCustomerId(customerId);
         this.status = OrderStatus.NEW;
         this.version = 0;
@@ -49,16 +49,6 @@ public class Order {
         this.updatedAt = Instant.now();
     }
 
-    public void removeItem(UUID itemId) {
-        validateModifiable();
-
-        boolean removed = items.removeIf(item -> Objects.equals(item.getId(), itemId));
-        if (!removed) {
-            throw new DomainException("Order item not found: " + itemId);
-        }
-        this.updatedAt = Instant.now();
-    }
-
     public void resolveOrderStatus(Integer expectedVersion) {
         validateVersionForUpdate(expectedVersion);
         validateCancelStatus();
@@ -77,13 +67,16 @@ public class Order {
         if (status == OrderStatus.FULFILLED) {
             throw new DomainException("Cannot cancel fulfilled order");
         }
-
+        cancelItems();
         this.status = OrderStatus.CANCELLED;
         this.version++;
         this.updatedAt = Instant.now();
     }
 
-    // Validation methods
+    private void cancelItems() {
+        items.forEach(item -> item.updateStatus(ItemStatus.CANCELED));
+    }
+
     private void validateModifiable() {
         if (status != OrderStatus.NEW) {
             throw new DomainException("Cannot modify order in status: " + status);
@@ -113,36 +106,11 @@ public class Order {
         return item.getStatus() == ItemStatus.PENDING;
     }
 
-    private void validateItemParameters(String productSku, String name, int quantity) {
-        if (productSku == null || productSku.trim().isEmpty()) {
-            throw new IllegalArgumentException("Product SKU cannot be null or empty");
-        }
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Product name cannot be null or empty");
-        }
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be positive");
-        }
-    }
-
     private UUID validateCustomerId(UUID customerId) {
         if (customerId == null) {
             throw new IllegalArgumentException("Customer ID cannot be null");
         }
         return customerId;
-    }
-
-    private OrderItem findItemById(UUID itemId) {
-        return items.stream()
-                    .filter(item -> Objects.equals(item.getId(), itemId))
-                    .findFirst()
-                    .orElseThrow(() -> new DomainException("Order item not found: " + itemId));
-    }
-
-    private List<OrderItemSnapshot> getItemsSnapshot() {
-        return items.stream()
-                    .map(item -> new OrderItemSnapshot(item.getSku(), item.getItemName(), item.getQuantity()))
-                    .toList();
     }
 
     // Getters

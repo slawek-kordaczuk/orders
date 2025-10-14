@@ -11,7 +11,7 @@ public class OrderItem {
     private ItemStatus status;
 
     public OrderItem(String sku, String itemName, int quantity) {
-        this.id = UUID.randomUUID();
+        this.id = null;
         this.sku = sku;
         this.itemName = itemName;
         this.quantity = validateQuantity(quantity);
