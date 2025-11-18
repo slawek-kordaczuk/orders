@@ -1,9 +1,13 @@
 package com.slimczes.orders.domain.model;
 
+import lombok.Getter;
+
 import java.util.Objects;
 import java.util.UUID;
 
+@Getter
 public class OrderItem {
+    // Getters
     private final UUID id;
     private final String sku;
     private final String itemName;
@@ -27,12 +31,8 @@ public class OrderItem {
         this.status = status;
     }
 
-    public void updateQuantity(int newQuantity) {
-        this.quantity = validateQuantity(newQuantity);
-    }
-
     public void updateStatus(ItemStatus newStatus) {
-        this.status = Objects.requireNonNull(newStatus, "Status cannot be null");
+        status = Objects.requireNonNull(newStatus, "Status cannot be null");
     }
 
     private int validateQuantity(int quantity) {
@@ -41,13 +41,6 @@ public class OrderItem {
         }
         return quantity;
     }
-
-    // Getters
-    public UUID getId() { return id; }
-    public String getSku() { return sku; }
-    public String getItemName() { return itemName; }
-    public int getQuantity() { return quantity; }
-    public ItemStatus getStatus() { return status; }
 
     @Override
     public boolean equals(Object o) {

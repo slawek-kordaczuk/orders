@@ -26,7 +26,6 @@ class OrderRepositoryService implements OrderRepository {
     private final OrderEntityMapper orderEntityMapper;
 
     @Override
-    @Transactional
     public Order upsert(Order order) {
         if (order.getId() == null) {
             OrderEntity entity = orderEntityMapper.toOrderEntity(order);
@@ -36,9 +35,11 @@ class OrderRepositoryService implements OrderRepository {
         return orderEntityMapper
                 .toOrderDomain(orderRepositoryCrud.findByIdOptional(order.getId())
                         .map(managedEntity -> {
-                            managedEntity.setStatus(order.getStatus());
+                            managedEntity.setOrderStatus(order.getOrderStatus());
+                            managedEntity.setPaymentStatus(order.getPaymentStatus());
+                            managedEntity.setAreItemsReserved(order.getAreItemsReserved());
+                            managedEntity.setIsPaymentCompleted(order.getIsPaymentCompleted());
                             managedEntity.setUpdatedAt(order.getUpdatedAt());
-                            managedEntity.setVersion(order.getVersion());
                             updateOrderItems(managedEntity, order);
                             return managedEntity;
                         }).orElseThrow(() -> {
@@ -67,7 +68,6 @@ class OrderRepositoryService implements OrderRepository {
     }
 
     @Override
-    @Transactional
     public void deleteById(UUID orderId) {
         orderRepositoryCrud.deleteById(orderId);
     }

@@ -1,7 +1,10 @@
 package com.slimczes.orders.service.order;
 
-import com.slimczes.orders.domain.event.OrderCancelled;
-import com.slimczes.orders.domain.event.OrderCreated;
+import com.slimczes.orders.domain.event.OrderCancelEvent;
+import com.slimczes.orders.domain.event.OrderCreateEvent;
+import com.slimczes.orders.domain.event.PaymentCancelEvent;
+import com.slimczes.orders.domain.event.PaymentCreateEvent;
+import com.slimczes.orders.domain.model.Money;
 import com.slimczes.orders.domain.model.Order;
 import com.slimczes.orders.domain.model.OrderItem;
 import com.slimczes.orders.domain.model.OrderItemSnapshot;
@@ -19,7 +22,7 @@ interface OrderMapper {
     @Mapping(target = "eventId", expression = "java(java.util.UUID.randomUUID())")
     @Mapping(target = "orderId", source = "createdOrderId")
     @Mapping(target = "occurredAt", source = "order.createdAt")
-    OrderCreated toOrderCreated(Order order, UUID createdOrderId);
+    OrderCreateEvent toOrderCreated(Order order, UUID createdOrderId);
 
     @Mapping(target = "name", source = "itemName")
     OrderItemSnapshot toOrderItemSnapshot(OrderItem orderItem);
@@ -27,7 +30,7 @@ interface OrderMapper {
     @Mapping(target = "eventId", expression = "java(java.util.UUID.randomUUID())")
     @Mapping(target = "orderId", source = "order.id")
     @Mapping(target = "occurredAt", source = "order.createdAt")
-    OrderCancelled toOrderCancelled(Order order, String reason);
+    OrderCancelEvent toOrderCancelled(Order order, String reason);
 
     OrderResponseDto toOrderResponseDto(Order order);
 
@@ -35,5 +38,10 @@ interface OrderMapper {
     @Mapping(target = "reservedQuantity", source = "quantity")
     @Mapping(target = "name", source = "itemName")
     OrderReservedItem toOrderReservedItem(OrderItem orderItem);
+
+    @Mapping(target = "amount", source = "amount")
+    PaymentCreateEvent toPaymentCreateEvent(UUID orderId, UUID clientId, Money amount);
+
+    PaymentCancelEvent toPaymentCancelEvent(UUID orderId, UUID clientId);
 
 }

@@ -1,20 +1,23 @@
 package com.slimczes.orders.domain.model;
 
+import com.slimczes.orders.domain.exception.DomainException;
+import lombok.Getter;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.slimczes.orders.domain.exception.DomainException;
-import com.slimczes.orders.domain.exception.OptimisticLockException;
-
+@Getter
 public class Order {
 
     private final UUID id;
     private final UUID customerId;
-    private OrderStatus status;
-    private Integer version;
+    private OrderStatus orderStatus;
+    private PaymentStatus paymentStatus;
+    private Boolean isPaymentCompleted;
+    private Boolean areItemsReserved;
     private final List<OrderItem> items;
     private final Instant createdAt;
     private Instant updatedAt;
@@ -22,88 +25,90 @@ public class Order {
     public Order(UUID customerId) {
         this.id = null;
         this.customerId = validateCustomerId(customerId);
-        this.status = OrderStatus.NEW;
-        this.version = 0;
+        this.orderStatus = OrderStatus.PENDING;
+        this.paymentStatus = PaymentStatus.PENDING;
+        this.areItemsReserved = false;
+        this.isPaymentCompleted = false;
         this.items = new ArrayList<>();
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
     }
 
     @Default
-    public Order(UUID id, UUID customerId, OrderStatus status, Integer version, List<OrderItem> items,
-                 Instant createdAt, Instant updatedAt) {
+    public Order(UUID id, UUID customerId, OrderStatus orderStatus, PaymentStatus paymentStatus, Boolean isPaymentCompleted, Boolean areItemsReserved,
+                 List<OrderItem> items, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.customerId = customerId;
-        this.status = status;
-        this.version = version;
+        this.orderStatus = orderStatus;
+        this.paymentStatus = paymentStatus;
+        this.isPaymentCompleted = isPaymentCompleted;
+        this.areItemsReserved = areItemsReserved;
         this.items = new ArrayList<>(items);
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
     public void createReservationItem(String sku, String name, int quantity) {
-        validateModifiable();
-
         OrderItem item = new OrderItem(sku, name, quantity);
         items.add(item);
-        this.updatedAt = Instant.now();
+        updatedAt = Instant.now();
     }
 
-    public void resolveOrderStatus(Integer expectedVersion) {
-        validateVersionForUpdate(expectedVersion);
-        validateCancelStatus();
-        if (isAnyItemPending()) {
-            this.status = OrderStatus.PENDING;
-            this.version++;
-            this.updatedAt = Instant.now();
-            return;
+    public void markItemsReserved() {
+        if (areItemsCompleted()) {
+            areItemsReserved = true;
+            updatedAt = Instant.now();
         }
-        this.status = OrderStatus.FULFILLED;
-        this.version++;
-        this.updatedAt = Instant.now();
+    }
+
+    public void markPaymentCompleted() {
+        isPaymentCompleted = true;
+        updatedAt = Instant.now();
+    }
+
+    public void updatePaymentStatus(PaymentStatus status) {
+        paymentStatus = status;
+        updatedAt = Instant.now();
+    }
+
+    public void resolveOrderStatus() {
+        if (isPaymentCompleted() && areItemsReserved) {
+            orderStatus = OrderStatus.FULFILLED;
+            updatedAt = Instant.now();
+        }
+    }
+
+    private boolean isPaymentCompleted() {
+        return paymentStatus != PaymentStatus.PENDING;
     }
 
     public void cancel() {
-        if (status == OrderStatus.FULFILLED) {
+        if (orderStatus == OrderStatus.FULFILLED) {
             throw new DomainException("Cannot cancel fulfilled order");
         }
         cancelItems();
-        this.status = OrderStatus.CANCELLED;
-        this.version++;
-        this.updatedAt = Instant.now();
+        cancelPayment();
+        orderStatus = OrderStatus.CANCELLED;
+        updatedAt = Instant.now();
     }
 
     private void cancelItems() {
         items.forEach(item -> item.updateStatus(ItemStatus.CANCELED));
     }
 
-    private void validateModifiable() {
-        if (status != OrderStatus.NEW) {
-            throw new DomainException("Cannot modify order in status: " + status);
+    private void cancelPayment() {
+        if (orderStatus == OrderStatus.FULFILLED) {
+            throw new DomainException("Cannot cancel payment for fulfilled order");
         }
+        paymentStatus = PaymentStatus.CANCELLED;
     }
 
-    private void validateVersionForUpdate(Integer expectedVersion) {
-        if (!Objects.equals(this.version, expectedVersion)) {
-            throw new OptimisticLockException(
-                "Version mismatch. Expected: " + expectedVersion + ", actual: " + version);
-        }
-    }
-
-    private void validateCancelStatus() {
-        switch (status) {
-            case CANCELLED, FULFILLED -> {
-                throw new DomainException("Cannot change status from " + status);
-            }
-        }
-    }
-
-    private boolean isAnyItemPending() {
+    private boolean areItemsCompleted() {
         return items.stream().anyMatch(this::validateItem);
     }
 
     private boolean validateItem(OrderItem item) {
-        return item.getStatus() == ItemStatus.PENDING;
+        return item.getStatus() != ItemStatus.PENDING;
     }
 
     private UUID validateCustomerId(UUID customerId) {
@@ -111,35 +116,6 @@ public class Order {
             throw new IllegalArgumentException("Customer ID cannot be null");
         }
         return customerId;
-    }
-
-    // Getters
-    public UUID getId() {
-        return id;
-    }
-
-    public UUID getCustomerId() {
-        return customerId;
-    }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public Integer getVersion() {
-        return version;
-    }
-
-    public List<OrderItem> getItems() {
-        return new ArrayList<>(items);
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
     }
 
     @Override

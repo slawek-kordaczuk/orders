@@ -1,13 +1,7 @@
 package com.slimczes.orders.adapter.messaging.in;
 
-import com.slimczes.orders.adapter.messaging.event.ItemFailed;
-import com.slimczes.orders.adapter.messaging.event.ItemReservationFailed;
-import com.slimczes.orders.adapter.messaging.event.ItemsReserved;
-import com.slimczes.orders.adapter.messaging.event.ReservedItem;
-import com.slimczes.orders.service.order.dto.OrderReservedFailedDto;
-import com.slimczes.orders.service.order.dto.OrderReservedFailedItem;
-import com.slimczes.orders.service.order.dto.OrderReservedDto;
-import com.slimczes.orders.service.order.dto.OrderReservedItem;
+import com.slimczes.orders.adapter.messaging.event.*;
+import com.slimczes.orders.service.order.dto.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -23,5 +17,9 @@ interface OrderReservedMapper {
     OrderReservedFailedDto toOrderReservedCancelFromEvent(ItemReservationFailed itemReservationFailed);
 
     OrderReservedFailedItem toOrderReservedCancelItem(ItemFailed itemFailed);
+
+    PaidSucceedDto toPaidSucceedFromEvent(PaidEvent paidEvent);
+
+    PaidFailedDto toPaidFailedFromEvent(PaidFailedEvent paidFailedEvent);
 
 }

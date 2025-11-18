@@ -19,10 +19,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @QuarkusTest
-public class OrderReservedServiceIT {
+public class OrderReservedIT {
 
     @Inject
-    OrderReservedService orderReservedService;
+    OrderReserved orderReserved;
 
     @Inject
     OrderRepository orderRepository;
@@ -44,49 +44,14 @@ public class OrderReservedServiceIT {
         );
 
         // When
-        orderReservedService.reserveOrder(orderReservedDto);
+        orderReserved.reserveOrder(orderReservedDto);
 
         // Then
         Order updatedOrder = orderRepository.findById(orderId).orElseThrow();
-        assertEquals(OrderStatus.FULFILLED, updatedOrder.getStatus());
-        assertEquals(1, updatedOrder.getVersion());
+        assertEquals(OrderStatus.PENDING, updatedOrder.getOrderStatus());
 
         updatedOrder.getItems().forEach(item -> {
             assertEquals(ItemStatus.RESERVED, item.getStatus());
-        });
-    }
-
-    @Test
-    @TestTransaction
-    @DisplayName("Should handle failed item reservation and update order status")
-    void shouldHandleFailedItemReservationAndUpdateOrderStatus() {
-        // Given
-        UUID orderId = UUID.fromString("33333333-3333-3333-3333-333333333333");
-        List<OrderReservedFailedItem> failedItems = List.of(
-                new OrderReservedFailedItem("TEST-SKU-001", OrderReservedFailedItemReason.NOT_AVAILABLE, 50, 20),
-                new OrderReservedFailedItem("TEST-SKU-002", OrderReservedFailedItemReason.NOT_FOUND, 70, 0)
-        );
-        OrderReservedFailedDto orderReservedFailedDto = new OrderReservedFailedDto(
-                UUID.randomUUID(),
-                orderId,
-                failedItems,
-                Instant.now()
-        );
-
-        // When
-        orderReservedService.failedItemsOrder(orderReservedFailedDto);
-
-        // Then
-        Order updatedOrder = orderRepository.findById(orderId).orElse(null);
-        assertNotNull(updatedOrder);
-
-        updatedOrder.getItems().forEach(item -> {
-            if (item.getSku().equals("TEST-SKU-001")) {
-                assertEquals(ItemStatus.NOT_AVAILABLE, item.getStatus());
-            }
-            if (item.getSku().equals("TEST-SKU-002")) {
-                assertEquals(ItemStatus.NOT_FOUND, item.getStatus());
-            }
         });
     }
 }

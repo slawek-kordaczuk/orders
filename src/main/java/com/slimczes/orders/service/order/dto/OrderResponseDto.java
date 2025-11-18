@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.UUID;
 
 import com.slimczes.orders.domain.model.OrderStatus;
+import com.slimczes.orders.domain.model.PaymentStatus;
 
 public record OrderResponseDto(
     UUID id,
     UUID customerId,
-    OrderStatus status,
-    int version,
+    OrderStatus orderStatus,
+    PaymentStatus paymentStatus,
     List<OrderReservedItem> items,
     Instant createdAt,
     Instant updatedAt

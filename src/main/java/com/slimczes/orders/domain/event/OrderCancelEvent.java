@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import com.slimczes.orders.domain.model.OrderItemSnapshot;
 
-public record OrderCancelled(
+public record OrderCancelEvent(
         UUID eventId,
         UUID orderId,
         UUID customerId,

@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import com.slimczes.orders.domain.model.OrderItemSnapshot;
 
-public record OrderCreated(
+public record OrderCreateEvent(
         UUID eventId,
         UUID orderId,
         UUID customerId,

@@ -1,9 +1,12 @@
 package com.slimczes.orders.domain.model;
 
+import lombok.Getter;
+
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
+@Getter
 public class Customer {
     private final UUID id;
     private final String email;
@@ -31,24 +34,6 @@ public class Customer {
         this.updatedAt = updatedAt;
     }
 
-    // Business methods
-    public void updateProfile(String name) {
-        this.name = name;
-        this.updatedAt = Instant.now();
-    }
-
-    public void markAsDeleted() {
-        if (deleted) {
-            throw new IllegalStateException("Customer is already deleted");
-        }
-        this.deleted = true;
-        this.updatedAt = Instant.now();
-    }
-
-    public boolean isActive() {
-        return !deleted;
-    }
-
     private String validateEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
             throw new IllegalArgumentException("Email cannot be null or empty");
@@ -58,14 +43,6 @@ public class Customer {
         }
         return email.toLowerCase().trim();
     }
-
-    // Getters
-    public UUID getId() { return id; }
-    public String getEmail() { return email; }
-    public String getName() { return name; }
-    public boolean isDeleted() { return deleted; }
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
 
     @Override
     public boolean equals(Object o) {

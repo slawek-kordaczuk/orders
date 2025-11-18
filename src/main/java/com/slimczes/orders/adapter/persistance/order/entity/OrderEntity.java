@@ -1,5 +1,6 @@
 package com.slimczes.orders.adapter.persistance.order.entity;
 
+import com.slimczes.orders.domain.model.PaymentStatus;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -32,11 +33,18 @@ public class OrderEntity {
     private UUID customerId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private OrderStatus status;
+    @Column(name = "order_status", nullable = false)
+    private OrderStatus orderStatus;
 
-    @Version
-    private Integer version;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status", nullable = false)
+    private PaymentStatus paymentStatus;
+
+    @Column(name = "is_payment_completed", nullable = false)
+    private Boolean isPaymentCompleted;
+
+    @Column(name = "are_items_reserved", nullable = false)
+    private Boolean areItemsReserved;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude

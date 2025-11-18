@@ -1,9 +1,9 @@
 package com.slimczes.orders.adapter.messaging.out;
 
+import com.slimczes.orders.domain.event.OrderCancelEvent;
+import com.slimczes.orders.domain.event.OrderCreateEvent;
 import jakarta.enterprise.context.ApplicationScoped;
 
-import com.slimczes.orders.domain.event.OrderCancelled;
-import com.slimczes.orders.domain.event.OrderCreated;
 import com.slimczes.orders.domain.port.messaging.ItemReservationPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.reactive.messaging.Channel;
@@ -14,31 +14,31 @@ import org.eclipse.microprofile.reactive.messaging.Emitter;
 class ItemReservationKafkaPublisher implements ItemReservationPublisher {
 
     @Channel("reservations")
-    Emitter<OrderCreated> reservationEmitter;
+    Emitter<OrderCreateEvent> reservationEmitter;
 
     @Channel("reservations-cancelled")
-    Emitter<OrderCancelled> cancellationEmitter;
+    Emitter<OrderCancelEvent> cancellationEmitter;
 
     @Override
-    public void publishItemReservation(OrderCreated orderCreated) {
-        log.info("Publishing item reservation request for order: {}", orderCreated);
-        reservationEmitter.send(orderCreated).whenComplete((v, ex) -> {
+    public void publishItemReservation(OrderCreateEvent orderCreateEvent) {
+        log.info("Publishing item reservation request for order: {}", orderCreateEvent);
+        reservationEmitter.send(orderCreateEvent).whenComplete((v, ex) -> {
             if (ex != null) {
-                log.error("Error sending item reservation request for order: {}", orderCreated.orderId(), ex);
+                log.error("Error sending item reservation request for order: {}", orderCreateEvent.orderId(), ex);
             } else {
-                log.info("Item reservation request sent for order: {}", orderCreated.orderId());
+                log.info("Item reservation request sent for order: {}", orderCreateEvent.orderId());
             }
         });
     }
 
     @Override
-    public void publishItemReservationCancel(OrderCancelled orderCancelled) {
-        log.info("Publishing item reservation cancellation for order: {}", orderCancelled);
-        cancellationEmitter.send(orderCancelled).whenComplete((v, ex) -> {
+    public void publishItemReservationCancel(OrderCancelEvent orderCancelEvent) {
+        log.info("Publishing item reservation cancellation for order: {}", orderCancelEvent);
+        cancellationEmitter.send(orderCancelEvent).whenComplete((v, ex) -> {
             if (ex != null) {
-                log.error("Error sending item reservation cancellation for order: {}", orderCancelled.orderId(), ex);
+                log.error("Error sending item reservation cancellation for order: {}", orderCancelEvent.orderId(), ex);
             } else {
-                log.info("Item reservation cancellation sent for order: {}", orderCancelled.orderId());
+                log.info("Item reservation cancellation sent for order: {}", orderCancelEvent.orderId());
             }
         });
     }
