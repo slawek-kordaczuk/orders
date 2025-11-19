@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 public class PaidSucceedIT {
@@ -42,7 +41,6 @@ public class PaidSucceedIT {
         // Then
         Order updatedOrder = orderRepository.findById(orderId).orElseThrow();
         assertEquals(PaymentStatus.COMPLETED, updatedOrder.getPaymentStatus());
-        assertTrue(updatedOrder.getIsPaymentCompleted());
         assertEquals(OrderStatus.PENDING, updatedOrder.getOrderStatus());
     }
 

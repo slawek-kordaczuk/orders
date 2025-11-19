@@ -1,20 +1,18 @@
 package com.slimczes.orders.adapter.persistance.order;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import com.slimczes.orders.adapter.persistance.order.entity.OrderEntity;
 import com.slimczes.orders.adapter.persistance.order.entity.OrderItemEntity;
 import com.slimczes.orders.domain.model.Order;
 import com.slimczes.orders.domain.model.OrderItem;
 import com.slimczes.orders.domain.port.repository.OrderRepository;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @ApplicationScoped
 @Slf4j
@@ -37,8 +35,6 @@ class OrderRepositoryService implements OrderRepository {
                         .map(managedEntity -> {
                             managedEntity.setOrderStatus(order.getOrderStatus());
                             managedEntity.setPaymentStatus(order.getPaymentStatus());
-                            managedEntity.setAreItemsReserved(order.getAreItemsReserved());
-                            managedEntity.setIsPaymentCompleted(order.getIsPaymentCompleted());
                             managedEntity.setUpdatedAt(order.getUpdatedAt());
                             updateOrderItems(managedEntity, order);
                             return managedEntity;

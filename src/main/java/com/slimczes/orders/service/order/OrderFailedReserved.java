@@ -2,7 +2,6 @@ package com.slimczes.orders.service.order;
 
 import com.slimczes.orders.domain.model.ItemStatus;
 import com.slimczes.orders.domain.model.OrderItem;
-import com.slimczes.orders.domain.model.OrderStatus;
 import com.slimczes.orders.domain.port.repository.OrderRepository;
 import com.slimczes.orders.service.order.dto.OrderReservedFailedDto;
 import com.slimczes.orders.service.order.dto.OrderReservedFailedItem;
@@ -10,22 +9,24 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @ApplicationScoped
 @RequiredArgsConstructor(onConstructor_ = @Inject)
+@Slf4j
 public class OrderFailedReserved {
 
     private final OrderRepository orderRepository;
 
     @Transactional
     public void failedItemsOrder(OrderReservedFailedDto orderReservedFailedDto) {
+        log.info("Order Failed Reserved for orderId: {}", orderReservedFailedDto.orderId());
         orderRepository.findById(orderReservedFailedDto.orderId()).ifPresentOrElse(order -> {
             orderReservedFailedDto.failedItems()
                     .forEach(reservedItem -> order.getItems().stream()
                             .filter(item -> item.getSku().equals(reservedItem.sku()))
                             .findAny()
                             .ifPresent(i -> resolveFailedStatus(i, reservedItem)));
-            order.markItemsReserved();
             order.resolveOrderStatus();
             orderRepository.upsert(order);
         }, () -> {

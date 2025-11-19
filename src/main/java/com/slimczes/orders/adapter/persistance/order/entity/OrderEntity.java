@@ -1,20 +1,14 @@
 package com.slimczes.orders.adapter.persistance.order.entity;
 
+import com.slimczes.orders.domain.model.OrderStatus;
 import com.slimczes.orders.domain.model.PaymentStatus;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import com.slimczes.orders.domain.model.OrderStatus;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Table(name = "orders")
@@ -39,12 +33,6 @@ public class OrderEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false)
     private PaymentStatus paymentStatus;
-
-    @Column(name = "is_payment_completed", nullable = false)
-    private Boolean isPaymentCompleted;
-
-    @Column(name = "are_items_reserved", nullable = false)
-    private Boolean areItemsReserved;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude

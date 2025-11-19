@@ -19,12 +19,6 @@
             <column name="payment_status" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
-            <column name="is_payment_completed" type="BOOLEAN">
-                <constraints nullable="false"/>
-            </column>
-            <column name="are_items_reserved" type="BOOLEAN">
-                <constraints nullable="false"/>
-            </column>
             <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
                 <constraints nullable="false"/>
             </column>
@@ -46,6 +40,10 @@
 
         <createIndex tableName="orders" indexName="idx_orders_status">
             <column name="order_status"/>
+        </createIndex>
+
+        <createIndex tableName="orders" indexName="idx_payment_status">
+            <column name="payment_status"/>
         </createIndex>
 
         <createIndex tableName="orders" indexName="idx_orders_created_at">

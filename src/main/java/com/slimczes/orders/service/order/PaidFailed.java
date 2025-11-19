@@ -6,18 +6,22 @@ import com.slimczes.orders.service.order.dto.PaidFailedDto;
 import com.slimczes.orders.service.order.dto.PaidFailedReasonDto;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @ApplicationScoped
 @RequiredArgsConstructor(onConstructor_ = @Inject)
+@Slf4j
 public class PaidFailed {
 
     private final OrderRepository orderRepository;
 
+    @Transactional
     public void paidFailed(PaidFailedDto paidFailedDto) {
+        log.info("Paid Failed for orderId: {}", paidFailedDto.orderId());
         orderRepository.findById(paidFailedDto.orderId()).ifPresentOrElse(order -> {
             order.updatePaymentStatus(resolveFailedStatus(paidFailedDto.reason()));
-            order.markPaymentCompleted();
             order.resolveOrderStatus();
             orderRepository.upsert(order);
         }, () -> {

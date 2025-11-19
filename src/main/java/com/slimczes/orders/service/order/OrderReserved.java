@@ -1,31 +1,29 @@
 package com.slimczes.orders.service.order;
 
+import com.slimczes.orders.domain.model.ItemStatus;
+import com.slimczes.orders.domain.model.Order;
+import com.slimczes.orders.domain.port.repository.OrderRepository;
+import com.slimczes.orders.service.order.dto.OrderReservedDto;
+import com.slimczes.orders.service.order.dto.OrderReservedItem;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-
-import com.slimczes.orders.domain.model.ItemStatus;
-import com.slimczes.orders.domain.model.Order;
-import com.slimczes.orders.domain.model.OrderItem;
-import com.slimczes.orders.domain.port.repository.OrderRepository;
-import com.slimczes.orders.service.order.dto.OrderReservedDto;
-import com.slimczes.orders.service.order.dto.OrderReservedFailedDto;
-import com.slimczes.orders.service.order.dto.OrderReservedFailedItem;
-import com.slimczes.orders.service.order.dto.OrderReservedItem;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @ApplicationScoped
 @RequiredArgsConstructor(onConstructor_ = @Inject)
+@Slf4j
 public class OrderReserved {
 
     private final OrderRepository orderRepository;
 
     @Transactional
     public void reserveOrder(OrderReservedDto orderReservedDto) {
+        log.info("Order Reserved for orderId: {}", orderReservedDto.orderId());
         orderRepository.findById(orderReservedDto.orderId()).ifPresentOrElse(order -> {
             orderReservedDto.reservedItems()
                     .forEach(item -> reservationItem(order, item));
-            order.markItemsReserved();
             order.resolveOrderStatus();
             orderRepository.upsert(order);
         }, () -> {

@@ -16,8 +16,6 @@ public class Order {
     private final UUID customerId;
     private OrderStatus orderStatus;
     private PaymentStatus paymentStatus;
-    private Boolean isPaymentCompleted;
-    private Boolean areItemsReserved;
     private final List<OrderItem> items;
     private final Instant createdAt;
     private Instant updatedAt;
@@ -27,22 +25,18 @@ public class Order {
         this.customerId = validateCustomerId(customerId);
         this.orderStatus = OrderStatus.PENDING;
         this.paymentStatus = PaymentStatus.PENDING;
-        this.areItemsReserved = false;
-        this.isPaymentCompleted = false;
         this.items = new ArrayList<>();
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
     }
 
     @Default
-    public Order(UUID id, UUID customerId, OrderStatus orderStatus, PaymentStatus paymentStatus, Boolean isPaymentCompleted, Boolean areItemsReserved,
+    public Order(UUID id, UUID customerId, OrderStatus orderStatus, PaymentStatus paymentStatus,
                  List<OrderItem> items, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.customerId = customerId;
         this.orderStatus = orderStatus;
         this.paymentStatus = paymentStatus;
-        this.isPaymentCompleted = isPaymentCompleted;
-        this.areItemsReserved = areItemsReserved;
         this.items = new ArrayList<>(items);
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -54,25 +48,13 @@ public class Order {
         updatedAt = Instant.now();
     }
 
-    public void markItemsReserved() {
-        if (areItemsCompleted()) {
-            areItemsReserved = true;
-            updatedAt = Instant.now();
-        }
-    }
-
-    public void markPaymentCompleted() {
-        isPaymentCompleted = true;
-        updatedAt = Instant.now();
-    }
-
     public void updatePaymentStatus(PaymentStatus status) {
         paymentStatus = status;
         updatedAt = Instant.now();
     }
 
     public void resolveOrderStatus() {
-        if (isPaymentCompleted() && areItemsReserved) {
+        if (isPaymentCompleted() && areItemsCompleted()) {
             orderStatus = OrderStatus.FULFILLED;
             updatedAt = Instant.now();
         }
