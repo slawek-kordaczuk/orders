@@ -2,8 +2,8 @@ package com.slimczes.orders.adapter.messaging.in;
 
 import com.slimczes.orders.adapter.messaging.event.PaidEvent;
 import com.slimczes.orders.adapter.messaging.event.PaidFailedEvent;
-import com.slimczes.orders.service.order.PaidFailed;
-import com.slimczes.orders.service.order.PaidSucceed;
+import com.slimczes.orders.service.payment.PaidFailed;
+import com.slimczes.orders.service.payment.PaidSucceed;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;

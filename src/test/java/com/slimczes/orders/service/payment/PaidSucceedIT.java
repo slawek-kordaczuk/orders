@@ -1,10 +1,10 @@
-package com.slimczes.orders.service.order;
+package com.slimczes.orders.service.payment;
 
 import com.slimczes.orders.domain.model.Order;
 import com.slimczes.orders.domain.model.OrderStatus;
 import com.slimczes.orders.domain.model.PaymentStatus;
 import com.slimczes.orders.domain.port.repository.OrderRepository;
-import com.slimczes.orders.service.order.dto.PaidSucceedDto;
+import com.slimczes.orders.service.payment.dto.PaidSucceedDto;
 import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;

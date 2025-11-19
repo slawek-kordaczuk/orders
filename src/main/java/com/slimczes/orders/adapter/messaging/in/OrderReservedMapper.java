@@ -2,10 +2,10 @@ package com.slimczes.orders.adapter.messaging.in;
 
 import com.slimczes.orders.adapter.messaging.event.*;
 import com.slimczes.orders.service.order.dto.*;
+import com.slimczes.orders.service.payment.dto.PaidFailedDto;
+import com.slimczes.orders.service.payment.dto.PaidSucceedDto;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
-import org.mapstruct.ValueMapping;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.JAKARTA_CDI)
 interface OrderReservedMapper {

@@ -1,4 +1,4 @@
-package com.slimczes.orders.service.order.dto;
+package com.slimczes.orders.service.payment.dto;
 
 import java.util.UUID;
 

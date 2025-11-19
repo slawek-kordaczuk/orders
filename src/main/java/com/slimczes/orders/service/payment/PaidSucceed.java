@@ -1,8 +1,8 @@
-package com.slimczes.orders.service.order;
+package com.slimczes.orders.service.payment;
 
 import com.slimczes.orders.domain.model.PaymentStatus;
 import com.slimczes.orders.domain.port.repository.OrderRepository;
-import com.slimczes.orders.service.order.dto.PaidSucceedDto;
+import com.slimczes.orders.service.payment.dto.PaidSucceedDto;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
