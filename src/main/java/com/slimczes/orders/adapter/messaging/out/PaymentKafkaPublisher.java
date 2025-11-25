@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 
+import java.util.concurrent.CompletionStage;
+
 @ApplicationScoped
 @Slf4j
 public class PaymentKafkaPublisher implements PaymentPublisher {
@@ -19,21 +21,22 @@ public class PaymentKafkaPublisher implements PaymentPublisher {
     Emitter<PaymentCancelEvent> paymentCancellEmitter;
 
     @Override
-    public void publishPayment(PaymentCreateEvent paymentCreateEvent) {
+    public CompletionStage<Void> publishPayment(PaymentCreateEvent paymentCreateEvent) {
         log.info("Publishing payment request for order: {}", paymentCreateEvent);
-        paymentEmitter.send(paymentCreateEvent).whenComplete((v, ex) -> {
-            if (ex != null) {
-                log.error("Error sending payment request for order: {}", paymentCreateEvent.orderId(), ex);
-            } else {
-                log.info("Payment request sent for order: {}", paymentCreateEvent.orderId());
-            }
-        });
+        return paymentEmitter.send(paymentCreateEvent)
+                .whenComplete((v, ex) -> {
+                    if (ex != null) {
+                        log.error("Error sending payment request for order: {}", paymentCreateEvent.orderId(), ex);
+                    } else {
+                        log.info("Payment request sent for order: {}", paymentCreateEvent.orderId());
+                    }
+                });
     }
 
     @Override
-    public void publishPaymentCancel(PaymentCancelEvent paymentCancelEvent) {
+    public CompletionStage<Void> publishPaymentCancel(PaymentCancelEvent paymentCancelEvent) {
         log.info("Publishing cancellation request for order: {}", paymentCancelEvent);
-        paymentCancellEmitter.send(paymentCancelEvent).whenComplete((v, ex) -> {
+        return paymentCancellEmitter.send(paymentCancelEvent).whenComplete((v, ex) -> {
             if (ex != null) {
                 log.error("Error sending payment cancellation for order: {}", paymentCancelEvent.orderId(), ex);
             } else {

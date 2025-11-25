@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 
+import java.util.concurrent.CompletionStage;
+
 @ApplicationScoped
 @Slf4j
 class ItemReservationKafkaPublisher implements ItemReservationPublisher {
@@ -20,9 +22,9 @@ class ItemReservationKafkaPublisher implements ItemReservationPublisher {
     Emitter<OrderCancelEvent> cancellationEmitter;
 
     @Override
-    public void publishItemReservation(OrderCreateEvent orderCreateEvent) {
+    public CompletionStage<Void> publishItemReservation(OrderCreateEvent orderCreateEvent) {
         log.info("Publishing item reservation request for order: {}", orderCreateEvent);
-        reservationEmitter.send(orderCreateEvent).whenComplete((v, ex) -> {
+        return reservationEmitter.send(orderCreateEvent).whenComplete((v, ex) -> {
             if (ex != null) {
                 log.error("Error sending item reservation request for order: {}", orderCreateEvent.orderId(), ex);
             } else {
@@ -32,9 +34,9 @@ class ItemReservationKafkaPublisher implements ItemReservationPublisher {
     }
 
     @Override
-    public void publishItemReservationCancel(OrderCancelEvent orderCancelEvent) {
+    public CompletionStage<Void> publishItemReservationCancel(OrderCancelEvent orderCancelEvent) {
         log.info("Publishing item reservation cancellation for order: {}", orderCancelEvent);
-        cancellationEmitter.send(orderCancelEvent).whenComplete((v, ex) -> {
+        return cancellationEmitter.send(orderCancelEvent).whenComplete((v, ex) -> {
             if (ex != null) {
                 log.error("Error sending item reservation cancellation for order: {}", orderCancelEvent.orderId(), ex);
             } else {

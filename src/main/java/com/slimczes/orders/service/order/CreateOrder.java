@@ -1,7 +1,6 @@
 package com.slimczes.orders.service.order;
 
-import com.slimczes.orders.domain.event.OrderCreateEvent;
-import com.slimczes.orders.domain.event.PaymentCreateEvent;
+import com.slimczes.orders.domain.model.Money;
 import com.slimczes.orders.domain.model.Order;
 import com.slimczes.orders.domain.port.messaging.ItemReservationPublisher;
 import com.slimczes.orders.domain.port.messaging.PaymentPublisher;
@@ -16,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @ApplicationScoped
 @RequiredArgsConstructor(onConstructor_ = @Inject)
@@ -30,7 +30,6 @@ public class CreateOrder {
 
     @Transactional
     public UUID createOrder(CreateOrderDto createOrderDto) {
-
         return customerRepository.findById(createOrderDto.customerId())
                 .map(customer -> {
                     Order order = new Order(customer.getId());
@@ -40,10 +39,8 @@ public class CreateOrder {
                                     item.name(),
                                     item.quantity()));
                     UUID orderId = orderRepository.upsert(order).getId();
-                    OrderCreateEvent orderCreateEvent = orderMapper.toOrderCreated(order, orderId);
-                    PaymentCreateEvent paymentCreateEvent = orderMapper.toPaymentCreateEvent(orderId, customer.getId(), createOrderDto.amount());
-                    itemReservationPublisher.publishItemReservation(orderCreateEvent);
-                    paymentPublisher.publishPayment(paymentCreateEvent);
+                    publishCreateReservations(order, orderId);
+                    publishPayment(orderId, customer.getId(), createOrderDto.amount());
                     return orderId;
                 }).orElseThrow(() -> new IllegalArgumentException("Customer not found: " + createOrderDto.customerId()));
     }
@@ -53,5 +50,15 @@ public class CreateOrder {
             log.warn("Order not found: {}", orderId);
             return null;
         });
+    }
+
+    private void publishCreateReservations(Order order, UUID orderId) {
+        CompletableFuture.supplyAsync(() -> orderMapper.toOrderCreated(order, orderId))
+                .thenCompose(itemReservationPublisher::publishItemReservation);
+    }
+
+    private void publishPayment(UUID orderId, UUID customerId, Money amount) {
+        CompletableFuture.supplyAsync(() -> orderMapper.toPaymentCreateEvent(orderId, customerId, amount))
+                .thenCompose(paymentPublisher::publishPayment);
     }
 }
